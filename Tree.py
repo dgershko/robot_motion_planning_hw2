@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.spatial.distance import cdist
 
 class RRTree():
     def __init__(self, root_state):
@@ -13,10 +12,13 @@ class RRTree():
         state = tuple(state)
         self.vertices[state] = RRNode(state, cost, parent_node)
     
+    def numpy_cdist(self, XA, XB):
+        return np.sqrt(np.sum((XA[:, None, :] - XB[None, :, :]) ** 2, axis=-1))
+    
     def get_nearest_state(self, state):
         state = np.array(state)
         vertices = list(self.vertices.keys())
-        distances = cdist([state], vertices)
+        distances = self.numpy_cdist(np.array([state]), np.array(vertices))
         nearest_vertex_index = np.argmin(distances)
         return vertices[nearest_vertex_index]
         # return min(self.vertices.keys(), key=lambda x: np.linalg.norm(np.array(x) - state))
@@ -49,7 +51,8 @@ class RRTree():
         if k >= len(states):
             return states
         state_arr = np.array(state)
-        distances = [np.linalg.norm(state_arr - np.array(p_node)) for p_node in states]
+        states_arr = np.array(states)
+        distances = np.linalg.norm(states_arr - state_arr, axis=1)
         partitioned_states = np.array(states)[np.argpartition(distances, k)][:k] # type: list
         partitioned_states = list([tuple(state) for state in partitioned_states])
         return partitioned_states
@@ -62,6 +65,7 @@ class RRTree():
         state_node = self.vertices[state]
         state_node.parent = new_parent_node
         state_node.cost = np.linalg.norm(np.array(state) - np.array(new_parent))
+    
 
 
 class RRNode():
