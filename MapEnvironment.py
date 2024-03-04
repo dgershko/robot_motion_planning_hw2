@@ -110,16 +110,13 @@ class MapEnvironment(object):
         Return the heuristic function for the A* algorithm.
         @param state The state (position) of the robot.
         '''
-
-        # TODO: Task 4.3
-
-        pass
+        return np.linalg.norm(np.array(state) - self.goal)
 
     # ------------------------#
     # Visualization Functions
     # ------------------------#
 
-    def visualize_map(self, show_map=False, plan=None, tree_edges=None, expanded_nodes=None):
+    def visualize_map(self, show_map=False, plan=None, tree_edges=None, expanded_nodes=None, title=None, text=None):
         '''
         Visualize map with current state of robot and obstacles in the map.
         @param show_map If to show the map or save it.
@@ -151,6 +148,11 @@ class MapEnvironment(object):
         # add goal or inspection points
         plt = self.visualize_point_location(plt=plt, state=self.goal, color='g')
 
+        if title:
+            plt.title(title)
+
+        if text:
+            plt.figtext(0.5, 0.01, text, wrap=True, horizontalalignment='center', fontsize=12)
         # show map
         if show_map:
             plt.show()
